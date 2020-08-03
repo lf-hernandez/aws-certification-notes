@@ -1,1 +1,1 @@
-# aws-notes
+# AWS Certification Notes
