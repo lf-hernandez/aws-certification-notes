@@ -16,22 +16,29 @@
   - [Table of Contents](#table-of-contents)
   - [AWS Global Infrastructure](#aws-global-infrastructure)
   - [Identity Access Management (IAM)](#identity-access-management-iam)
-    - [IAM - What is it](#iam---what-is-it)
-    - [IAM - Features](#iam---features)
-    - [Terminology](#terminology)
-    - [What can be done from within the Console](#what-can-be-done-from-within-the-console)
+    - [What is IAM](#what-is-iam)
+    - [IAM Features](#iam-features)
+      - [Terminology](#terminology)
+      - [What can be done from within the Console](#what-can-be-done-from-within-the-console)
   - [Simple Storage Service (S3)](#simple-storage-service-s3)
-    - [S3 - What is it](#s3---what-is-it)
-    - [S3 - Features](#s3---features)
-    - [Object structure](#object-structure)
-    - [Consistency model](#consistency-model)
-    - [Guarantees](#guarantees)
-    - [Tiers [sorted by price]](#tiers-sorted-by-price)
-    - [How are you billed](#how-are-you-billed)
-    - [Transfer acceleration](#transfer-acceleration)
-    - [Cross region replication](#cross-region-replication)
-    - [Scenarios for each Tier](#scenarios-for-each-tier)
+    - [What is S3](#what-is-s3)
+    - [S3 Features](#s3-features)
+      - [Object structure](#object-structure)
+      - [Consistency model](#consistency-model)
+      - [Guarantees](#guarantees)
+      - [Tiers [sorted by price]](#tiers-sorted-by-price)
+      - [How are you billed](#how-are-you-billed)
+      - [Transfer acceleration](#transfer-acceleration)
+      - [Cross region replication](#cross-region-replication)
+      - [Scenarios for each Tier](#scenarios-for-each-tier)
     - [Security & Encryption](#security--encryption)
+    - [Versioning](#versioning)
+      - [What is Versioning](#what-is-versioning)
+      - [Versioning Features](#versioning-features)
+      - [Considerations](#considerations)
+    - [Lifecycle Management](#lifecycle-management)
+      - [What is S3 Lifecycle Management](#what-is-s3-lifecycle-management)
+      - [Lifecycle Management Features](#lifecycle-management-features)
 
 ## AWS Global Infrastructure
 
@@ -41,11 +48,11 @@
 
 ## Identity Access Management (IAM)
 
-### IAM - What is it
+### What is IAM
 
 It's a service that provides a means to manage users and their access level in the AWS Console.
 
-### IAM - Features
+### IAM Features
 
 - Centralized control
 - Shared access
@@ -57,7 +64,7 @@ It's a service that provides a means to manage users and their access level in t
 - AWS services integration
 - PCI DSS Compliance (Credit Card)
 
-### Terminology
+#### Terminology
 
 - Users: people, employees, etc.
 - Groups: collection of users. Permissions are inherited for each user.
@@ -65,7 +72,7 @@ It's a service that provides a means to manage users and their access level in t
 - Roles: Assignable permissions given to AWS Resources to interact with other AWS Resources
 - Root Account: Account used to register for AWS. Essentially has Super User access and should be avoided. Defer most tasks to user accounts.
 
-### What can be done from within the Console
+#### What can be done from within the Console
 
 - Assign custom IAM users sign-in link (Account Alias). This is a public URL so it must be unique.
 - Activate MFA on root Account.
@@ -77,11 +84,11 @@ It's a service that provides a means to manage users and their access level in t
 
 ## Simple Storage Service (S3)
 
-### S3 - What is it
+### What is S3
 
 Object-based cloud storage.
 
-### S3 - Features
+### S3 Features
 
 - Object-based (key-value pair)
 - File size can range from 0 Bytes to 5 TB
@@ -96,7 +103,7 @@ Object-based cloud storage.
 - Securing via Access Control Lists & Bucket Policies
 - HTTP status codes are used to describe operation state e.g. HTTP 200 on successful upload
 
-### Object structure
+#### Object structure
 
 - Key
 - Value
@@ -106,17 +113,17 @@ Object-based cloud storage.
   - Access Control Lists
   - Torrents
 
-### Consistency model
+#### Consistency model
 
 - Read after write consistency for PUTS of new objects
 - Eventual consistency for overwrite PUTS and DELETES
 
-### Guarantees
+#### Guarantees
 
 - 99.99% availability
 - 99.999999999% durability for S3 information (Eleven Nines)
 
-### Tiers [sorted by price]
+#### Tiers [sorted by price]
 
 - S3 Standard
   - Guarantees listed above
@@ -139,7 +146,7 @@ Object-based cloud storage.
   - Lowest-cost storage class
   - Acceptable retrieval time of up 12 hours or more
 
-### How are you billed
+#### How are you billed
 
 - Storage
 - Requests
@@ -148,15 +155,15 @@ Object-based cloud storage.
 - Transfer acceleration
 - Cross region replication pricing
   
-### Transfer acceleration
+#### Transfer acceleration
 
 Takes advantage of Cloud Front Edge Locations to optimize data transfer network paths over long distances between the S3 bucket and it's end users. End user -> EL -> S3 vs End user -> S3
 
-### Cross region replication
+#### Cross region replication
 
 Replication of objects across different buckets in different regions. Use case: high availability and disaster recovery
 
-### Scenarios for each Tier
+#### Scenarios for each Tier
 
 Almost always go with Intelligent Tiering, it tends to be cheaper and makes use of both Standard and IA. If you need something lower-cost without redundancy go with One Zone IA, but understand that if the AZ fails you could loose your data. For archiving go with Glacier if data is accessed more than once or twice a year, otherwise go with Glacier Deep Archive
 
@@ -185,3 +192,35 @@ Types of encryption:
       - Customer Managed
   - Client Side Encryption
     - Encrypt object locally before uploading to S3
+
+### Versioning
+
+#### What is Versioning
+
+Change sets of object's state (writes and deletes) logically grouped as individual versions and stores as such in the object itself.
+
+#### Versioning Features
+
+- Lifecycle Management integration
+- MFA on Delete
+
+#### Considerations
+
+- Once this feature is enabled it cannot be disabled, only suspended
+- All versions for a given object will be stored in the object, so this will signify an exponential increase in the size of the object overtime. When architecting consider disabling versioning all together if working with large objects that require many changes or utilize lifecycle policy to retire versions
+- When uploading a new version, access gets reset to private. Older versions will retain their access level
+- Even if you delete an object and bucket doesn't show the object, all previous versions of the object will be kept. S3 simply places a delete marker
+- Deleted object can be restored by deleting the delete marker. It will restore the object to the latest version prior to the delete marker
+- Versions can be deleted
+
+### Lifecycle Management
+
+#### What is S3 Lifecycle Management
+
+Feature that allows you to set rules that describe how S3 will manage your objects. 
+
+#### Lifecycle Management Features
+
+- Automatic transitions to tiered storage
+- Automatic expiration policies on objects cased on retention needs or clean up of incomplete multipart uploads
+  
