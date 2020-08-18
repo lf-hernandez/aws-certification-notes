@@ -26,10 +26,12 @@
     - [Object structure](#object-structure)
     - [Consistency model](#consistency-model)
     - [Guarantees](#guarantees)
-    - [Tiers](#tiers)
+    - [Tiers [sorted by price]](#tiers-sorted-by-price)
     - [How are you billed](#how-are-you-billed)
     - [Transfer acceleration](#transfer-acceleration)
     - [Cross region replication](#cross-region-replication)
+    - [Scenarios for each Tier](#scenarios-for-each-tier)
+    - [Security & Encryption](#security--encryption)
 
 ## AWS Global Infrastructure
 
@@ -114,7 +116,7 @@ Object-based cloud storage.
 - 99.99% availability
 - 99.999999999% durability for S3 information (Eleven Nines)
 
-### Tiers
+### Tiers [sorted by price]
 
 - S3 Standard
   - Guarantees listed above
@@ -124,11 +126,11 @@ Object-based cloud storage.
   - For infrequently accessed data that requires rapid access when needed
   - Lower Fee than S3 Standard
   - Charges retrieval fee
+- S3 - Intelligent Tiering
+  - AI-based option that optimizes cost byt automatically moving data to the most effective access ties based on usage
 - S3 One Zone - IA
   - Lower-option for infrequently accessed data
   - For files that don't require multiple AZ data resilience
-- S3 - Intelligent Tiering
-  - AI-based option that optimizes cost byt automatically moving data to the most effective access ties based on usage
 - S3 Glacier
   - Designed for data archiving
   - Reliable storage at costs competitive with or cheaper than on-premise solutions
@@ -153,3 +155,33 @@ Takes advantage of Cloud Front Edge Locations to optimize data transfer network 
 ### Cross region replication
 
 Replication of objects across different buckets in different regions. Use case: high availability and disaster recovery
+
+### Scenarios for each Tier
+
+Almost always go with Intelligent Tiering, it tends to be cheaper and makes use of both Standard and IA. If you need something lower-cost without redundancy go with One Zone IA, but understand that if the AZ fails you could loose your data. For archiving go with Glacier if data is accessed more than once or twice a year, otherwise go with Glacier Deep Archive
+
+### Security & Encryption
+
+By default, newly created buckets are private.
+
+You can setup Access Control on buckets using:
+
+- Bucket Policies
+- Access Control Lists
+
+Logging can be configured and will generate access logs for all requests made to the bucket for which it's configured. You can then send those logs to another bucket on the same account or another bucket in another account.
+
+Types of encryption:
+
+- **Encryption In Transit**
+  - SSL/TLS
+- **Encryption At Rest**
+  - Server Side Encryption
+    - S3 Managed Keys (SSE-S3)
+      - S3 Managed AES-256 Encryption
+    - AWS Key Management Service Managed Keys (SSE-KMS)
+      - Shared Management
+    - SSE with Customer Provided Keys (SSE-C)
+      - Customer Managed
+  - Client Side Encryption
+    - Encrypt object locally before uploading to S3
