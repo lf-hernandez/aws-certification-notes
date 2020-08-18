@@ -1,5 +1,5 @@
 # AWS Certification Notes
 
-## [AWS Certified Solutions Architect - Associate](aws-certified-solutions-architect-associate/README.md)
+## [AWS Certified Solutions Architect - Associate](associate/solutions-architect/README.md)
 
-## [AWS Certified Developer - Associate](aws-certified-developer-associate/README.md)
+## [AWS Certified Developer - Associate](associate/developer/README.md)
