@@ -36,13 +36,22 @@
   - [Lifecycle Management](#lifecycle-management)
     - [What is S3 Lifecycle Management](#what-is-s3-lifecycle-management)
     - [Lifecycle Management Features](#lifecycle-management-features)
+  - [Object Lock](#object-lock)
+    - [What is S3 Object Lock](#what-is-s3-object-lock)
+    - [What is a retention period in relation to object lock](#what-is-a-retention-period-in-relation-to-object-lock)
+    - [What is a Legal Hold in relation to object lock](#what-is-a-legal-hold-in-relation-to-object-lock)
+    - [Modes](#modes)
+      - [***Governance***](#governance)
+      - [***Compliance***](#compliance)
+  - [Glacier Vault Lock](#glacier-vault-lock)
+    - [What is vault lock](#what-is-vault-lock)
 
 ## AWS Global Infrastructure
 
 - Region: Geographical area consisting of 2+ Availability Zones
 - Availability Zone: Data Center(s)
 - Edge Location: End points used for caching content (Cloud Front)
-
+ 
 ## Identity Access Management (IAM)
 
 ### What is IAM
@@ -221,3 +230,34 @@ Feature that allows you to set rules that describe how S3 will manage your objec
 - Automatic transitions to tiered storage
 - Automatic expiration policies on objects cased on retention needs or clean up of incomplete multipart uploads
   
+### Object Lock
+
+Add an extra layer of protection against object changes and deletion.
+
+#### What is S3 Object Lock
+
+Feature that allows objects to be stored in a write once, read many (WORM) model. This ensures objects will not be deleted or modified for a fixed period of time or indefinitely.
+
+#### What is a retention period in relation to object lock
+
+Period of time for which lock settings on an object will be in place. S3 places a timestamp in the objects versions metadata to indicate when the retention period expires.
+
+#### What is a Legal Hold in relation to object lock
+
+Much like a retention period a legal hold prevents an object version from being overwritten or deleted with the exception that it doesn't have a fixed period of time. The lock settings will be in place until any user with a ```s3:PutObjectLegalHold``` permission decides to remove it.
+
+#### Modes
+
+##### ***Governance***
+
+Prevents alteration of retention settings and the ability modify or delete an object version by most users. Permissions must be assigned in order to alter the lock settings or object explicitly.
+
+##### ***Compliance***
+
+Prevents any alteration of lock settings or ability to modify or delete an object by all users (including root).
+
+### Glacier Vault Lock
+
+#### What is vault lock
+
+Similar to S3 Object Locks but applied to S3 Glacier. You can easily deploy and enforce compliance conrols for individual instances of S3 Glacier vaults with a **Value Lock policy**
